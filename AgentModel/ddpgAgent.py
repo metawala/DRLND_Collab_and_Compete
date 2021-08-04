@@ -19,7 +19,7 @@ ACTORLEARNING  = 1e-4
 CRITICLEARNING = 1e-3
 WEIGHTDECAY    = 0
 NUMAGENTS      = 2
-NUMUPDATESTEPS = 10
+NUMSTEPSTOUPDATE = 10
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -28,8 +28,8 @@ class ReplayBuffer():
         self.actionSize = actionSize
         self.memory = deque(maxlen = bufferSize)
         self.batchSize = batchSize
-        self.seed = random.seed(seed)
         self.experience = namedtuple("Experience", field_names = ["state", "action", "reward", "nextState", "done"])
+        self.seed = random.seed(seed)
 
     def add(self, state, action, reward, nextState, done, numAgents):
         for i in range(numAgents):
@@ -39,11 +39,11 @@ class ReplayBuffer():
     def sample(self):
         experiences = random.sample(self.memory, k = self.batchSize)
 
-        states = torch.from_numpy(np.vstack([exp.state for exp in experiences if exp is not None])).float().to(device)
-        actions = torch.from_numpy(np.vstack([exp.action for exp in experiences if exp is not None])).float().to(device)
-        rewards = torch.from_numpy(np.vstack([exp.reward for exp in experiences if exp is not None])).float().to(device)
+        states     = torch.from_numpy(np.vstack([exp.state for exp in experiences if exp is not None])).float().to(device)
+        actions    = torch.from_numpy(np.vstack([exp.action for exp in experiences if exp is not None])).float().to(device)
+        rewards    = torch.from_numpy(np.vstack([exp.reward for exp in experiences if exp is not None])).float().to(device)
         nextStates = torch.from_numpy(np.vstack([exp.nextState for exp in experiences if exp is not None])).float().to(device)
-        dones = torch.from_numpy(np.vstack([exp.done for exp in experiences if exp is not None]).astype(np.uint8)).float().to(device)
+        dones      = torch.from_numpy(np.vstack([exp.done for exp in experiences if exp is not None]).astype(np.uint8)).float().to(device)
 
         return (states, actions, rewards, nextStates, dones)
 
@@ -53,7 +53,7 @@ class ReplayBuffer():
 
 class OUNoise():
     def __init__(self, size, seed, mu = 0, theta = 0.15, sigma = 0.2):
-        self.mu = mu
+        self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
         self.seed = random.seed(seed)
@@ -70,24 +70,24 @@ class OUNoise():
         return self.state
 
 class Agent():
-    def __init__(self, stateSize, actionSize, seed):
-        self.stateSize = stateSize
+    def __init__(self, stateSize, actionSize, randomSeed):
+        self.stateSize  = stateSize
         self.actionSize = actionSize
-        self.seed = random.seed(seed)
+        self.seed       = random.seed(randomSeed)
 
-        self.actorLocal = Actor(stateSize, actionSize, seed).to(device)
-        self.actorTarget = Actor(stateSize, actionSize, seed).to(device)
+        self.actorLocal     = Actor(stateSize, actionSize, randomSeed).to(device)
+        self.actorTarget    = Actor(stateSize, actionSize, randomSeed).to(device)
         self.actorOptimizer = optim.Adam(self.actorLocal.parameters(), lr = ACTORLEARNING)
-        self.criticLocal = Critic(stateSize, actionSize, seed).to(device)
-        self.criticTarget = Critic(stateSize, actionSize, seed).to(device)
+        self.criticLocal     = Critic(stateSize, actionSize, randomSeed).to(device)
+        self.criticTarget    = Critic(stateSize, actionSize, randomSeed).to(device)
         self.criticOptimizer = optim.Adam(self.criticLocal.parameters(), lr = CRITICLEARNING, weight_decay = WEIGHTDECAY)
 
-        self.noise = [OUNoise(actionSize, seed) for i in range(NUMAGENTS)]
-        self.memory = ReplayBuffer(actionSize, BUFFERSIZE, BATCHSIZE, seed)
+        self.noise  = [OUNoise(actionSize, randomSeed) for i in range(NUMAGENTS)]
+        self.memory = ReplayBuffer(actionSize, BUFFERSIZE, BATCHSIZE, randomSeed)
 
     def step(self, state, action, reward, nextState, done):
         if len(self.memory) > BATCHSIZE:
-            for i in range(NUMUPDATESTEPS):
+            for i in range(NUMSTEPSTOUPDATE):
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
     
