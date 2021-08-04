@@ -19,6 +19,7 @@ The environment is considered solved, when the average (over 100 episodes) of th
 The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm - 4 action space. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
 
 Below are the characteristics of the environment:
+
 ![Environment Characteristics][image5]
 
 ## Learning Algorithm:
