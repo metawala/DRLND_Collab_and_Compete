@@ -57,6 +57,10 @@ Comprehensively, all hyperparameters are as such:
 ### Experience Replay:
 With a `BUFFERSIZE = int(1e6)` and a `BATCHSIZE = 1024` we create a data container - the replay buffer. We batch from this random indepenent samples to stabally train the network.
 
+## Trained Model and Weights:
+1. The trained model can be [Found Here](https://github.com/metawala/DRLND_Collab_and_Compete/tree/master/weights)
+2. Final weights that solved the model are at [Project Root Folder](https://github.com/metawala/DRLND_Collab_and_Compete) as *_solved.pth_
+
 ## Plots of Rewards:
 Initially without a random seed and batch normalization the model took way too much time to train. However, after adding a random seed and updating the initializer and adding batch normalization we can see that the model was solved in **`1027 EPISODES`**.
 
