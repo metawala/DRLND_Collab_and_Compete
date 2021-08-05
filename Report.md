@@ -5,6 +5,8 @@
 [image3]: ./ReportImages/CriticModel.png "Critic Model"
 [image4]: ./ReportImages/HyperParameters.png "Hyper Parameters"
 [image5]: ./ReportImages/EnvCharac.png "Environment Characteristics"
+[image6]: ./ReportImages/PsuedoCode.png "Psuedo Code"
+[image7]: ./ReportImages/OUNoise.png "OUNoise"
 
 # Project Report : Collaboration and Competition
 This project report is in relation with the third project in DRLND course - Continuous Control. The observation space consists of 8 variables corresponding to the position and velocity of the ball and racket. Each agent receives its own, local observation.  Two continuous actions are available, corresponding to movement toward (or away from) the net, and jumping. 
@@ -57,6 +59,14 @@ Comprehensively, all hyperparameters are as such:
 ### Experience Replay:
 With a `BUFFERSIZE = int(1e6)` and a `BATCHSIZE = 1024` we create a data container - the replay buffer. We batch from this random indepenent samples to stabally train the network.
 
+Following a psuedo code for the DDPG algorithm used:
+
+![Psuedo Code][image6]
+
+We have also added noise to our agent:
+
+![OUNoise][image7]
+
 ## Trained Model and Weights:
 1. The trained model can be [Found Here](https://github.com/metawala/DRLND_Collab_and_Compete/tree/master/weights)
 2. Final weights that solved the model are at [Project Root Folder](https://github.com/metawala/DRLND_Collab_and_Compete) as *_solved.pth_
@@ -65,6 +75,7 @@ With a `BUFFERSIZE = int(1e6)` and a `BATCHSIZE = 1024` we create a data contain
 Initially without a random seed and batch normalization the model took way too much time to train. However, after adding a random seed and updating the initializer and adding batch normalization we can see that the model was solved in **`1027 EPISODES`**.
 
 Below is a graph of the reward as plotted agains episodes:
+
 ![Result Graph][image2]
 
 ## Ideas for Future Work:
